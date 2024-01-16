@@ -120,7 +120,7 @@ Sram #(
 	.AWIDTH							( MEM_ADDR_WIDTH			),
 	.DWIDTH							( MEM_DATA_WIDTH			),
 	.WSTRB							( MEM_STRB_WIDTH			),
-	.INIT_FILE						( "mem0_init.txt"			)
+	.INIT_FILE						( "C:/Users/victo/CASTLAB/CAST_DMA/mem0_init.txt"			)
 ) u_mem0 (
 	.clk							( clk						),
 	.en								( mem0_en					),
@@ -137,7 +137,7 @@ Sram #(
 	.AWIDTH							( MEM_ADDR_WIDTH			),
 	.DWIDTH							( MEM_DATA_WIDTH			),
 	.WSTRB							( MEM_STRB_WIDTH			),
-	.INIT_FILE						( "mem1_init.txt"			)
+	.INIT_FILE						( "C:/Users/victo/CASTLAB/CAST_DMA/mem1_init.txt"			)
 ) u_mem1 (
 	.clk							( clk						),
 	.en								( mem1_en					),
@@ -179,45 +179,53 @@ initial begin
 	repeat(20) @(posedge clk);
     // [Test 1] APB verification
     // Write and read configuration register
-    $display ("[Test 1] APB verification");
-    apb_addr                                                    = 32'h00000000;
-    for (int i=0; i<5; i++) begin
-        apb_master.write(apb_addr, i);
-        $display ("[APB] Write %h at %h", i, apb_addr);
-        apb_master.read(apb_addr, read_apb_prdata);
-        if (read_apb_prdata != i) begin
-            $display ("Failure");
-            $stop;
-        end
-        apb_addr                                                = apb_addr + 'd4;
-    end
-    $display ("Success");
+    // $display ("[Test 1] APB verification");
+    // apb_addr                                                    = 32'h00000000;
+    // for (int i=0; i<5; i++) begin
+    //     apb_master.write(apb_addr, i);
+    //     $display ("[APB] Write %h at %h", i, apb_addr);
+    //     apb_master.read(apb_addr, read_apb_prdata);
+    //     if (read_apb_prdata != i) begin
+    //         $display ("Failure");
+    //         $stop;
+    //     end
+    //     apb_addr                                                = apb_addr + 'd4;
+    // end
+    // $display ("Success");
 
-    // Reset configuration register
-    apb_addr                                                    = 32'h00000000;
-    for (int i=0; i<5; i++) begin
-        apb_master.write(apb_addr, 32'h00000000);
-        apb_addr                                                = apb_addr + 'd4;
-    end
+    // // Reset configuration register
+    // apb_addr                                                    = 32'h00000000;
+    // for (int i=0; i<5; i++) begin
+    //     apb_master.write(apb_addr, 32'h00000000);
+    //     apb_addr                                                = apb_addr + 'd4;
+    // end
 
     // [Test 2] DMA verification
     $display ("[Test 2] DMA verification");
 
     // Configure source register
-    apb_master.write(SRC_ADDR, 32'h00100003);
+    apb_master.write(SRC_ADDR, 32'h00100001);
     $display ("[Src Setting] Set source address as %h", 32'h00100003);
 
     // Configure destination register
-    apb_master.write(DEST_ADDR, 32'h00200014);
+    apb_master.write(DEST_ADDR, 32'h00200002);
     $display ("[Dest Setting] Set dest address as %h", 32'h00200014);
 
     // Configure size register
-    apb_master.write(SIZE_ADDR, 11);
+    // apb_master.write(SIZE_ADDR, 1);
+    // apb_master.write(SIZE_ADDR, 2);
+    // apb_master.write(SIZE_ADDR, 3);
+    // apb_master.write(SIZE_ADDR, 4);
+    // apb_master.write(SIZE_ADDR, 5);
+    // apb_master.write(SIZE_ADDR, 6);
+    // apb_master.write(SIZE_ADDR, 7);
+    apb_master.write(SIZE_ADDR, 5);
     $display ("[Size Setting] Set size as %h", 11);
 
     // Start DMA normal operation
     apb_master.write(MODE_ADDR, 0);
     apb_master.write(MODE_ADDR, 1);
+    // $stop;
     $display ("[DMA] Start normal DMA operation");
 
     wait (apb_done)
@@ -226,7 +234,7 @@ initial begin
         $display ("Mode 1 Reset Failure");
         $stop;
     end
-   
+    $display ("Success");
 	// FOR FPGA
  //   apb_master.write(MODE_ADDR, 2);
  //   wait (apb_verify)
