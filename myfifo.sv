@@ -15,7 +15,7 @@ module FIFO  //////////�??�� 최근 버전
     // output logic                            pop_finish
 );
 logic                                       wr_en;
-logic                                       rd_end;
+logic                                       rd_en;
 // logic                                       count;
 
 logic [15:0]                                wr_ptr, rd_ptr;
@@ -28,6 +28,8 @@ always_ff @ (posedge clk) begin
     if (~rstn) begin 
         wr_ptr <= 16'd0;
         rd_ptr <= 16'd0;
+        full <= 1'b0;
+        empty <= 1'b1;
     end
     else begin
         if (wr_en) begin 
