@@ -95,6 +95,10 @@ assign fifo_RSTN = RSTN & reset_fifo; //FIFO seset은 DMA 연산 1개가 끝나�
 //////////////////////////////
 always_ff @ (posedge CLK, negedge RSTN) begin
     PREADY <= 0;
+    if (INTR) begin 
+        reg_mode <= 0;
+        INTR <= 0;
+    end
     if(~RSTN) begin
         reg_src_addr <= 32'h0;
         reg_dst_addr <= 32'h0;
@@ -107,29 +111,44 @@ always_ff @ (posedge CLK, negedge RSTN) begin
     else if(PENABLE & PSEL) begin
         case(PADDR)
             SRC_ADDR : begin
-                reg_src_addr <= PWDATA;
+                if(PWRITE) reg_src_addr <= PWDATA;
+                else PRDATA <= reg_src_addr;
                 PREADY <= 1;
             end
             DEST_ADDR : begin
-                reg_dst_addr <= PWDATA;
+                if(PWRITE) reg_dst_addr <= PWDATA;
+                else PRDATA <= reg_dst_addr;
                 PREADY <= 1;
             end
             SIZE_ADDR : begin
-                reg_size <= PWDATA;
+                if(PWRITE) reg_size <= PWDATA;
+                else PRDATA <= reg_size;
                 PREADY <= 1;
             end
+            // MODE_ADDR : begin
+            //     if (INTR) begin 
+            //         reg_mode <= 'b0;
+            //         PRDATA <= 'b0;
+            //     end
+            //     else begin
+            //         if(PWRITE) reg_mode <= PWDATA;
+            //         else PRDATA <= reg_mode;
+            //     end
+            //     PREADY <= 1;
             MODE_ADDR : begin
-                if (INTR) reg_mode <= 0;
-                else reg_mode <= PWDATA;
+                if(PWRITE) reg_mode <= PWDATA;
+                else PRDATA <= reg_mode;
                 PREADY <= 1;
             end
             INT_ADDR : begin
-                reg_interrput <= PWDATA;
+                if(PWRITE) reg_interrput <= PWDATA;
+                else PRDATA <= reg_interrput;
                 PREADY <= 1;
                 reg_mode <= 32'h0;
                 
             end
             default : begin
+                PRDATA <= PWRITE;
                 reg_src_addr <= 32'h0;
                 reg_dst_addr <= 32'h0;
                 reg_size <= 32'h0;
@@ -370,6 +389,7 @@ always_comb begin
                 next_state = IDLE;
                 // count = 0;
                 count_w = 0;
+                // @ (posedge CLK);
                 // reg_mode = 0;
             end
         endcase
